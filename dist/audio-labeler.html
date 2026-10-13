@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>توزيع المقاطع الصوتية — إتقان</title>
+<style>
+:root{--teal:#0e8f8a;--orange:#ff7a2f;--line:#d3e7e3;--bg:#f1faf8;--ink:#0f2b2e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:500 15px/1.6 Tahoma,Arial,sans-serif;padding:14px;max-width:760px;margin-inline:auto}
+h1{font-size:20px;margin:0 0 4px}p{margin:4px 0 10px;color:#4f6f72}
+.row{display:flex;gap:8px;align-items:center;background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px 10px;margin-block:6px}
+.row.done{border-color:var(--teal)}
+.n{font-weight:800;width:30px;text-align:center}.d{font-size:12px;color:#4f6f72;width:44px}
+button{font:inherit;border:0;border-radius:10px;padding:8px 12px;background:var(--teal);color:#fff;font-weight:800;cursor:pointer}
+button.o{background:var(--orange);color:#2a1100}button.g{background:#fff;color:var(--ink);border:2px solid var(--line)}
+select{flex:1;min-width:0;font:inherit;padding:8px;border:2px solid var(--line);border-radius:10px;background:#fff}
+.bar{position:sticky;bottom:0;background:var(--bg);padding:10px 0;display:flex;gap:8px;flex-wrap:wrap}
+#msg{font-weight:800;color:var(--teal)}
+</style></head><body>
+<h1>🎧 توزيع المقاطع الصوتية</h1>
+<p>اضغط ▶ واسمع كل مقطع، ثم اختر المكان المناسب له من القائمة. تقدر تعيّن أكثر من مقطع لنفس المكان (يُختار واحد منها عشوائياً). المقاطع غير المناسبة اتركها «بدون».</p>
+<div id="list"></div>
+<div class="bar"><button class="o" id="save">💾 حفظ وتجربة على هذا الجهاز</button><button id="dl">⬇ تنزيل audio-map.json</button><button class="g" id="cp">📋 نسخ</button><span id="msg"></span></div>
+<audio id="a"></audio><script src="audio-data.js"></script>
+<script>
+const EV=[["","— بدون —"],["welcome","ترحيب بالزائر الجديد"],["back","عودة المستخدم"],["good","تشجيع: أحسنت / ممتاز"],["retry","حاول مرة أخرى"],["achieve","إنجاز / وسام / ترقية مستوى"],["saved","حفظ أو تحميل"],["login","طلب تسجيل الدخول"],["loginok","تم تسجيل الدخول"],["bonus","مكافأة اليوم / أيام متتالية"],["gstart","بدء لعبة"]];
+const src=id=>(window.ITQAN_AUDIO&&ITQAN_AUDIO[id])||"audio/"+id+".mp3";
+const N=20,list=document.getElementById("list"),a=document.getElementById("a");let saved={};
+try{saved=JSON.parse(localStorage.getItem("itqan_vox_map")||"{}")}catch(e){}
+const rev={};Object.entries(saved).forEach(([ev,ids])=>ids.forEach(i=>rev[i]=ev));
+for(let i=1;i<=N;i++){const id=String(i).padStart(2,"0"),r=document.createElement("div");r.className="row";
+ r.innerHTML=`<span class="n">${i}</span><button data-p="${id}">▶</button><span class="d" id="d${id}"></span><select data-id="${id}">${EV.map(([v,t])=>`<option value="${v}"${rev[id]===v?" selected":""}>${t}</option>`).join("")}</select>`;list.appendChild(r);
+ const t=new Audio(src(id));t.addEventListener("loadedmetadata",()=>{document.getElementById("d"+id).textContent=t.duration.toFixed(1)+" ث"})}
+list.onclick=e=>{const b=e.target.closest("[data-p]");if(b){a.src=src(b.dataset.p);a.play()}};
+list.onchange=e=>{e.target.closest(".row").classList.toggle("done",!!e.target.value)};
+document.querySelectorAll("select").forEach(s=>s.closest(".row").classList.toggle("done",!!s.value));
+const build=()=>{const m={};document.querySelectorAll("select").forEach(s=>{if(s.value)(m[s.value]=m[s.value]||[]).push(s.dataset.id)});return m};
+const msg=t=>{document.getElementById("msg").textContent=t};
+document.getElementById("save").onclick=()=>{localStorage.setItem("itqan_vox_map",JSON.stringify(build()));msg("✅ تم الحفظ على هذا الجهاز. افتح الموقع وجرّب.")};
+document.getElementById("dl").onclick=()=>{const l=document.createElement("a");l.href=URL.createObjectURL(new Blob([JSON.stringify(build(),null,1)],{type:"application/json"}));l.download="audio-map.json";l.click();msg("ارفع الملف audio-map.json على GitHub بجانب index.html")};
+document.getElementById("cp").onclick=()=>navigator.clipboard.writeText(JSON.stringify(build())).then(()=>msg("✅ تم النسخ، الصقه في المحادثة"),()=>msg("تعذر النسخ"));
+</script></body></html>
