@@ -49,7 +49,15 @@ a.btn{text-decoration:none;display:inline-block}
 .vx-contact{margin-top:10px;font-size:13px}
 .vx-contact a{color:var(--teal);font-weight:800}
 body{font-size:13.5px}
-.cards{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+section.page{padding-block:8px}.hero{padding-block:8px 4px;gap:12px}.h2{margin-block:8px 5px}
+.cards{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px}
+.card{border-radius:18px;background:linear-gradient(145deg,var(--surface),color-mix(in srgb,var(--c,var(--teal)) 9%,var(--surface)));overflow:hidden;transition:transform .18s ease,box-shadow .18s ease}
+.card:hover,.subj:hover,.grade:hover,.v3q:hover,.v3g:hover,.vx-tile:hover{transform:translateY(-4px);box-shadow:0 8px 0 color-mix(in srgb,var(--teal) 18%,transparent)}
+.cover,.subj i,.grade span,.v3q i,.v3g .e,.vx-tile i{animation:vxicon 2.8s ease-in-out infinite;transform-origin:center bottom}
+@keyframes vxicon{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+.btn,.ibtn,.grade,.subj,.v3q,.v3g,.tile,.opt{border-radius:16px}
+footer{margin-top:12px;padding-block:10px!important}
+.vx-lib-hidden{display:none!important}
 .card .bd{padding:8px 10px 10px;gap:4px}.card h3{font-size:13.5px}.meta{font-size:10.5px}
 .card .bd>.hint{font-size:11.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .cover{height:54px;font-size:30px}
@@ -59,10 +67,16 @@ body{font-size:13.5px}
 .ibtn{width:32px;height:32px;font-size:13px}
 .h2{margin-block:14px 8px}.h2 h2{font-size:17px}
 @media(max-width:760px){
- .vx-bb{display:flex}body{padding-bottom:74px}.top nav{display:none}
+ .vx-bb{display:flex}body{padding-bottom:74px;font-size:15px}.top nav{display:none}
  .top .wrap{gap:6px}.tools{order:3;width:100%;overflow-x:auto;scrollbar-width:none}
  .hero{padding-block:4px;gap:4px}.hero p.lead,.stats{display:none}.mwrap{width:104px!important}
  .vx-adv{bottom:calc(80px + env(safe-area-inset-bottom,0px))}.vx-advb{bottom:calc(122px + env(safe-area-inset-bottom,0px))}
+ .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.card .bd{padding:7px}.card .row{flex-direction:column;align-items:stretch}.card .row .btn{width:100%}
+ .card h3{font-size:15px}.cover{height:60px;font-size:34px}.grade span{font-size:24px}.subj i{font-size:22px}.v3q i{font-size:36px}
+ .v3curcard{font-size:14px;min-height:64px}.v3curstep>h3{font-size:18px}.v3curstep>h3 b{width:34px;height:34px;font-size:18px}
+ .v3l h4{font-size:17px}.v3l .n{width:38px;height:38px;font-size:18px}
+ .vx-bb button{font-size:12px}.vx-bb button i{font-size:22px}
+ .v3g .e{font-size:38px}.v3g b{font-size:15px}
 }
 @media(min-width:600px){.vx-hub{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:761px){body{font-size:14.5px}.cards{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}.vx-scr .vx-sb{padding-inline:max(14px,calc((100% - 1000px)/2))}}
@@ -133,7 +147,8 @@ const CH={
  parent:{n:"ولي أمر",i:SH+'<rect x="52" y="146" width="96" height="62" rx="28" fill="#fff" stroke="#e1e6ea" stroke-width="3"/><path d="M52 150Q100 134 148 150L148 176Q100 160 52 176Z" fill="#8a5a2b" opacity=".85"/><path d="M46 100Q44 34 100 34Q156 34 154 100L162 156L38 156Z" fill="#fff" stroke="#dfe3e7" stroke-width="3"/><circle cx="100" cy="100" r="40" fill="#e3b083"/>'+'<path d="M58 66 Q100 44 142 66" stroke="#1a1a1a" stroke-width="8" fill="none" stroke-linecap="round"/>'+'<path d="M62 106Q68 148 100 150Q132 148 138 106Q120 128 100 128Q80 128 62 106Z" fill="#3a2a22"/>'+EY(98)+'<path d="M88 118Q100 126 112 118" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>'}
 };
 function mount(){const s=document.querySelector(".mwrap .mascot");if(s&&CH[prefs.char])s.outerHTML=S(CH[prefs.char].i,"mascot")}
-function setChar(k){prefs.char=k;store.set("itqan_prefs",prefs);mount()}
+function applyLibraryAccess(){const allowed=prefs.char==="teacher";document.querySelectorAll('[data-go="lib"],nav button[data-go="lib"]').forEach(el=>{el.classList.toggle("vx-lib-hidden",!allowed);el.setAttribute("aria-hidden",String(!allowed))});if(!allowed&&document.querySelector("#p-lib")&&!document.querySelector("#p-lib").hidden&&typeof window.go==="function")window.go("home");window.__itqanRefreshNav&&window.__itqanRefreshNav()}
+	function setChar(k){prefs.char=k;store.set("itqan_prefs",prefs);mount();applyLibraryAccess()}
 window.itqanSetChar=setChar;window.itqanCharNames=()=>Object.fromEntries(Object.entries(CH).map(([k,c])=>[k,c.n]));
 function picker(first){
  const o=document.createElement("div");o.className="vx-ov";o.setAttribute("role","dialog");o.setAttribute("aria-label","اختر من أنت");
@@ -163,7 +178,7 @@ const contactHtml=()=>b=>{const y=new Date().getFullYear();b.innerHTML=`
 safe("nav",()=>{
  history.replaceState({p:"home"},"");
  const og=window.go;
- window.go=function(p){const had=!!document.querySelector(".vx-scr");closeScrDom();og.apply(this,arguments);syncBar();
+ window.go=function(p){if(p==="lib"&&prefs.char!=="teacher"){toast("المكتبة متاحة للمعلم فقط");p="home"}const had=!!document.querySelector(".vx-scr");closeScrDom();og.apply(this,arguments);syncBar();
   if(!fromPop){if(had)history.replaceState({p},"");else if(p!==curPage)history.pushState({p},"")}curPage=p};
  addEventListener("popstate",e=>{closeScrDom();const p=(e.state&&e.state.p)||"home";if(p!==curPage&&PAGES.includes(p)){fromPop=true;go(p);fromPop=false}});
  ["lib","games","prep","occ","my","admin"].forEach(k=>{const s=$("#p-"+k);if(!s)return;const d=document.createElement("div");d.className="vx-pbar";d.innerHTML='<button class="btn g sm" aria-label="رجوع">→ رجوع</button>';d.firstChild.onclick=()=>history.length>1?history.back():go("home");s.prepend(d)});
@@ -178,11 +193,11 @@ safe("nav",()=>{
   const x=SEC.find(s=>s[0]===id);openScr(x[1]+" "+x[2],moveNode(id))}});
 
 /* ========== الشريط السفلي ========== */
-const BB=[["home","🏠","الرئيسية"],["lib","📚","المكتبة"],["games","🎮","الألعاب"],["prep","📝","التحضير"],["cur","🖥️","المناهج"],["my","⭐","مكتبتي"]];
+const BB=[["home","🏠","الرئيسية"],["lib","📚","المكتبة"],["games","🎮","الألعاب"],["prep","📝","التحضير"],["cur","🖥️","المناهج الدراسية"],["my","⭐","مكتبتي"]];
 let bar;
-function syncBar(){if(!bar)return;const c=PAGES.find(k=>!$("#p-"+k).hidden),items=BB.slice();if(!$("#navAdmin").hidden)items.push(["admin","🛠️","الإدارة"]);
+function syncBar(){if(!bar)return;const c=PAGES.find(k=>!$("#p-"+k).hidden),items=BB.filter(([k])=>k!=="lib"||prefs.char==="teacher");if(!$("#navAdmin").hidden)items.push(["admin","🛠️","الإدارة"]);
  bar.innerHTML=items.map(([k,e,n])=>`<button data-go="${k}" aria-current="${c===k}"><i>${e}</i>${n}</button>`).join("")}
-safe("bottom-bar",()=>{bar=document.createElement("nav");bar.className="vx-bb";bar.setAttribute("aria-label","التنقل السفلي");$("main").after(bar);syncBar();
+safe("bottom-bar",()=>{bar=document.createElement("nav");bar.className="vx-bb";bar.setAttribute("aria-label","التنقل السفلي");$("main").after(bar);window.__itqanRefreshNav=syncBar;syncBar();applyLibraryAccess();
  const ou=window.updUser;if(ou)window.updUser=function(){ou.apply(this,arguments);syncBar()}});
 
 /* ========== الأذكار ========== */

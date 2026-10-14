@@ -1,5 +1,5 @@
-const CACHE_VERSION = "itqan-20261012-1";
-const SHELL = ["./", "./index.html", "./special.html", "./config.js?v=20261012-1", "./itqan-addon.js?v=20261012-1", "./itqan-curriculum.js?v=20261012-1", "./itqan-v3.js?v=20261012-1", "./special-addon.js?v=20261012-1", "./special-letters.js?v=6", "./special-math.js?v=6"];
+const CACHE_VERSION = "itqan-20261013-1";
+const SHELL = ["./", "./index.html", "./special.html", "./config.js?v=20261013-1", "./itqan-addon.js?v=20261013-1", "./itqan-curriculum.js?v=20261013-1", "./itqan-v3.js?v=20261013-1", "./special-addon.js?v=20261013-1", "./special-letters.js?v=20261013-1", "./special-math.js?v=20261013-1", "./special-words.js?v=20261013-1"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));

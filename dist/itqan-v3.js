@@ -397,23 +397,26 @@ safe("activity", () => {
 });
 
 /* ================= المناهج والعروض ================= */
-const cs = { g: 1, s: "math", t: 1 };
+const cs = { g: 1, s: "math", t: 1, u: 0 };
 const pptxLoad = () => window.PptxGenJS ? Promise.resolve(window.PptxGenJS) : new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.bundle.js"; s.onload = () => window.PptxGenJS ? res(window.PptxGenJS) : rej(); s.onerror = rej; document.head.appendChild(s) });
 function lessonOf(i) { return CUR.build(cs.g, cs.s, cs.t, i) }
 function renderCur() {
   const host = $("#curBody"); if (!host) return;
   const ready = [...Object.keys(CUR.LESSONS)].map(k => k.split("|"));
   const L = CUR.list(cs.g, cs.s, cs.t);
+  const units = CUR.listUnits(cs.g, cs.s, cs.t);
+  const UL = cs.u < units.length ? CUR.listByUnit(cs.g, cs.s, cs.t, cs.u) : L;
   const cards = (items, key, selected) => items.map(([value, title, note]) => `<button class="v3curcard" data-cs="${key}" data-v="${value}" aria-pressed="${String(selected) === String(value)}">${title}${note ? `<small>${note}</small>` : ""}</button>`).join("");
-  let h = `<p class="hint">عروض تفاعلية بملء الشاشة + ملف PowerPoint قابل للتحميل + ورقة عمل للطباعة + لعبة، لكل درس. اختر الفصل الدراسي أولاً، ثم الصف والمادة.</p>
+  let h = `<p class="hint">عروض تفاعلية بملء الشاشة + ملف PowerPoint قابل للتحميل + ورقة عمل للطباعة + لعبة، لكل درس. اختر الفصل الدراسي، ثم الصف والمادة والوحدة.</p>
   <div class="v3cur">
    <section class="v3curstep"><h3><b>١</b> اختر الفصل الدراسي</h3><div class="v3curcards">${cards([1, 2, 3].map(t => [t, `📚 ${CUR.TERMS[t - 1]}`, t === 1 ? "المحتوى المتاح يبدأ هنا" : "تصفح المحتوى المتاح"]), "t", cs.t)}</div></section>
    <section class="v3curstep"><h3><b>٢</b> اختر الصف</h3><div class="v3curcards">${cards(GRADES.map(g => [g, `${["🐣", "🧸", "🎈", "🚀", "🧪", "🏆", "🎓"][g]} ${gn(g)}`, `${CUR.list(g, cs.s, cs.t).length} درس متاح`]), "g", cs.g)}</div></section>
-   <section class="v3curstep"><h3><b>٣</b> اختر المادة</h3><div class="v3curcards">${cards(Object.entries(SUBJ).map(([k, v]) => [k, `${v[1]} ${v[0]}`, CUR.list(cs.g, k, cs.t).length ? `${CUR.list(cs.g, k, cs.t).length} درس` : "قيد الإعداد"]), "s", cs.s)}</div></section>
+   <section class="v3curstep"><h3><b>٣</b> اختر المادة</h3><div class="v3curcards">${cards(Object.entries(SUBJ).filter(([k]) => k === "math" || k === "arabic").map(([k, v]) => [k, `${v[1]} ${v[0]}`, CUR.list(cs.g, k, cs.t).length ? `${CUR.list(cs.g, k, cs.t).length} درس` : "قيد الإعداد"]), "s", cs.s)}</div></section>
+   ${units.length ? `<section class="v3curstep"><h3><b>٤</b> اختر الوحدة</h3><div class="v3curcards">${cards(units.map((u, idx) => [idx, `${u.e} ${u.n}`, `${CUR.listByUnit(cs.g, cs.s, cs.t, idx).length} درس`]), "u", cs.u)}</div></section>` : ""}
   </div>
   <div class="v3prog"><span class="on">✅ جاهز الآن: ${ready.length} مجموعة دروس (${ready.reduce((n, r) => n + CUR.LESSONS[r.join("|")].length, 0)} درساً)</span><span>الباقي يُضاف تباعاً</span></div>`;
-  if (L.length) {
-    h += `<div class="h2"><h2>${SUBJ[cs.s][1]} ${SUBJ[cs.s][0]} · ${gn(cs.g)} · ${CUR.TERMS[cs.t - 1]}</h2><span class="hint">${L.length} درساً</span></div><div class="v3les">${L.map(x => `<article class="v3l"><div class="row" style="flex-wrap:nowrap"><span class="n">${AR(x.i + 1)}</span><h4>${x.title}</h4></div><div class="row"><button class="btn sm" data-cl="show" data-i="${x.i}">▶ عرض تفاعلي</button><button class="btn o sm" data-cl="pptx" data-i="${x.i}">⬇ PowerPoint</button><button class="btn g sm" data-cl="ws" data-i="${x.i}">🖨 ورقة عمل</button><button class="btn g sm" data-cl="game" data-i="${x.i}">🎮 لعبة الدرس</button></div></article>`).join("")}</div>`;
+  if (UL.length) {
+    h += `<div class="h2"><h2>${SUBJ[cs.s][1]} ${SUBJ[cs.s][0]} · ${gn(cs.g)} · ${CUR.TERMS[cs.t - 1]}${units.length && cs.u < units.length ? " · " + units[cs.u].n : ""}</h2><span class="hint">${UL.length} درساً</span></div><div class="v3les">${UL.map(x => `<article class="v3l"><div class="row" style="flex-wrap:nowrap"><span class="n">${AR(x.i + 1)}</span><h4>${x.title}</h4></div><div class="row"><button class="btn sm" data-cl="show" data-i="${x.i}">▶ عرض تفاعلي</button><button class="btn o sm" data-cl="pptx" data-i="${x.i}">⬇ PowerPoint</button><button class="btn g sm" data-cl="ws" data-i="${x.i}">🖨 ورقة عمل</button><button class="btn g sm" data-cl="game" data-i="${x.i}">🎮 لعبة الدرس</button></div></article>`).join("")}</div>`;
   } else {
     h += `<div class="empty"><div class="big">🦉🛠️</div><h3>دروس هذه المادة قيد الإعداد</h3><p>نضيف المواد دفعات متتالية. الدفعة الأولى جاهزة الآن.</p><div class="row" style="justify-content:center;margin-top:10px"><button class="btn o" data-cs="jump">🚀 افتح الدفعة الجاهزة</button><button class="btn g" data-cs="req">💬 اطلب هذه المادة بالأولوية</button></div></div>`;
   }
@@ -478,13 +481,13 @@ async function dlPptx(i) {
 }
 safe("cur-page", () => {
   const main = $("main"), sec = document.createElement("section"); sec.className = "page"; sec.id = "p-cur"; sec.hidden = true;
-  sec.innerHTML = `<div class="h2"><h2>🖥️ العروض والمناهج</h2></div><div id="curBody"></div>`; main.appendChild(sec);
+  sec.innerHTML = `<div class="h2"><h2>🖥️ المناهج الدراسية</h2></div><div id="curBody"></div>`; main.appendChild(sec);
   PAGES.push("cur");
-  const nb = document.createElement("button"); nb.dataset.go = "cur"; nb.textContent = "🖥️ المناهج"; $('nav button[data-go="games"]').after(nb);
+  const nb = document.createElement("button"); nb.dataset.go = "cur"; nb.textContent = "🖥️ المناهج الدراسية"; $('nav button[data-go="games"]').after(nb);
   const og = window.go; window.go = function (p) { og.apply(this, arguments); if (p === "cur") renderCur() };
   sec.addEventListener("click", e => {
     const c = e.target.closest("[data-cs]"), l = e.target.closest("[data-cl]");
-    if (c) { const k = c.dataset.cs; if (k === "jump") { Object.assign(cs, { g: 1, s: "math", t: 1 }) } else if (k === "req") { sendFeedback("request", `طلب مادة: ${SUBJ[cs.s][0]} - ${gn(cs.g)} - ${CUR.TERMS[cs.t - 1]}`); return toast("وصل طلبك ✅") } else cs[k] = k === "s" ? c.dataset.v : +c.dataset.v; return renderCur() }
+    if (c) { const k = c.dataset.cs; if (k === "jump") { Object.assign(cs, { g: 1, s: "math", t: 1, u: 0 }) } else if (k === "req") { sendFeedback("request", `طلب مادة: ${SUBJ[cs.s][0]} - ${gn(cs.g)} - ${CUR.TERMS[cs.t - 1]}`); return toast("وصل طلبك ✅") } else { cs[k] = k === "s" ? c.dataset.v : +c.dataset.v; if (k === "t" || k === "g" || k === "s") cs.u = 0 } return renderCur() }
     if (l) { const i = +l.dataset.i, k = l.dataset.cl; const les = lessonOf(i);
       if (k === "show") openDeck(les); else if (k === "pptx") needAuth(() => dlPptx(i)); else if (k === "ws") openWs(les); else if (k === "game") openLessonGame(les) }
   });
@@ -535,7 +538,7 @@ function applyRole() {
   let hi = $(".v3hi"); if (!hi) { hi = document.createElement("div"); hi.className = "v3hi"; h1.before(hi) } hi.textContent = g[0]; h1.innerHTML = g[1];
 }
 safe("home", () => {
-  const T = [["lib", "📚", "المكتبة", "أنشطة جاهزة للتنفيذ", "linear-gradient(135deg,#0e8f8a,#12b3ab)"], ["games", "🎮", "الألعاب", "ألعاب مرتّبة بالنوع", "linear-gradient(135deg,#ff7a2f,#ff9f5a)"], ["cur", "🖥️", "العروض والمناهج", "PowerPoint لكل درس", "linear-gradient(135deg,#7048e8,#9775fa)", 1], ["prep", "📝", "التحضير", "حضّر حصتك بدقيقة", "linear-gradient(135deg,#1c7ed6,#4dabf7)"], ["occ", "🌙", "المناسبات", "رمضان والوطني والعيد", "linear-gradient(135deg,#c2255c,#f06595)"], ["my", "⭐", "مكتبتي", "مفضلتك وإنجازاتك", "linear-gradient(135deg,#2f9e44,#69db7c)"]];
+  const T = [["lib", "📚", "المكتبة", "أنشطة جاهزة للتنفيذ", "linear-gradient(135deg,#0e8f8a,#12b3ab)"], ["games", "🎮", "الألعاب", "ألعاب مرتّبة بالنوع", "linear-gradient(135deg,#ff7a2f,#ff9f5a)"], ["cur", "🖥️", "المناهج الدراسية", "عروض لكل درس", "linear-gradient(135deg,#7048e8,#9775fa)", 1], ["prep", "📝", "التحضير", "حضّر حصتك بدقيقة", "linear-gradient(135deg,#1c7ed6,#4dabf7)"], ["occ", "🌙", "المناسبات", "رمضان والوطني والعيد", "linear-gradient(135deg,#c2255c,#f06595)"], ["my", "⭐", "مكتبتي", "مفضلتك وإنجازاتك", "linear-gradient(135deg,#2f9e44,#69db7c)"]];
   const q = document.createElement("div"); q.className = "v3quick";
   q.innerHTML = T.map(([k, e, n, s, bg, nw]) => `<button class="v3q${nw ? " new" : ""}" data-go="${k}" style="background:${bg}"><i>${e}</i>${n}<small>${s}</small></button>`).join("");
   const hub = $(".vx-hub"); (hub || $(".hero")).before(q);

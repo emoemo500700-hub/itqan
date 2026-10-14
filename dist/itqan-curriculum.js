@@ -131,6 +131,17 @@ function lessonWord(title, seed) {
   return { title, slides: S };
 }
 
+const UNITS = {
+  "1|math|1": [
+    { n: "الوحدة الأولى: الأعداد من ١ إلى ١٠", e: "🔢", range: [0, 7] },
+    { n: "الوحدة الثانية: المقارنة والترتيب", e: "⚖️", range: [4, 7] },
+    { n: "الوحدة الثالثة: الجمع والطرح", e: "➕", range: [8, 14] }
+  ],
+  "1|arabic|1": [
+    { n: "الوحدة الأولى: حروف اللغة", e: "🔤", range: [0, 4] },
+    { n: "الوحدة الثانية: القراءة والكتابة", e: "📖", range: [3, 6] }
+  ]
+};
 const LESSONS = {
   "1|math|1": [
     ["العدّ من ١ إلى ٥", s => lessonCount("العدّ من ١ إلى ٥", 1, 5, s)],
@@ -155,6 +166,13 @@ const SUBJ_N = { quran: "القرآن الكريم", islamic: "الدراسات 
 const TERMS = ["الفصل الأول", "الفصل الثاني", "الفصل الثالث"];
 const key = (g, s, t) => `${g}|${s}|${t}`;
 function list(g, s, t) { return (LESSONS[key(g, s, t)] || []).map((x, i) => ({ i, title: x[0] })); }
+function listUnits(g, s, t) { return UNITS[key(g, s, t)] || []; }
+function listByUnit(g, s, t, unitIdx) {
+  const u = (UNITS[key(g, s, t)] || [])[unitIdx]; if (!u) return [];
+  const L = LESSONS[key(g, s, t)] || [];
+  const [lo, hi] = u.range;
+  return L.map((x, i) => ({ i, title: x[0] })).filter(x => x.i >= lo && x.i <= hi);
+}
 function build(g, s, t, i) {
   const L = LESSONS[key(g, s, t)]; if (!L || !L[i]) return null;
   const seed = (+g + 1) * 100000 + Object.keys(SUBJ_N).indexOf(s) * 10000 + t * 1000 + i * 7 + 13;
@@ -233,6 +251,6 @@ function buildPptx(PptxGenJS, les) {
   return p;
 }
 
-root.ITQAN_CUR = { AR, GR_N, SUBJ_N, TERMS, LESSONS, list, build, worksheetHtml, gameText, buildPptx, hasLessons: (g, s, t) => !!LESSONS[key(g, s, t)], key };
+root.ITQAN_CUR = { AR, GR_N, SUBJ_N, TERMS, UNITS, LESSONS, list, listUnits, listByUnit, build, worksheetHtml, gameText, buildPptx, hasLessons: (g, s, t) => !!LESSONS[key(g, s, t)], key };
 if (typeof module !== "undefined") module.exports = root.ITQAN_CUR;
 })(typeof window !== "undefined" ? window : globalThis);

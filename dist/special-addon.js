@@ -86,7 +86,7 @@ const x2=document.createElement("style");x2.textContent=`.tbar{flex-wrap:wrap}.d
 table.pt{width:100%;border-collapse:collapse}table.pt th{background:#0e8f8a;color:#fff;width:24%;padding:8px;border:1.5px solid #0a6e6a;vertical-align:top;text-align:start}table.pt td{border:1.5px solid #0e8f8a;padding:4px;background:var(--surface,#fff)}table.pt tr:nth-child(even) td{background:var(--soft,#eef)}table.pt textarea{border:0;background:transparent;width:100%}
 .lg table{border-collapse:collapse;width:100%}.lg th,.lg td{border:1.5px solid #0e8f8a;padding:4px;text-align:center;font-size:.8rem}.lg th{background:#0e8f8a;color:#fff}`;document.head.appendChild(x2);
 /* intro screens before every interactive lesson */
-if(typeof startLesson==="function"){const oS=window.startLesson;window.startLesson=function(){const r=oS.apply(this,arguments);if(typeof L!=="undefined"&&L)L.paused=true;intro();return r}}
+if(typeof startLesson==="function"){const oS=window.startLesson;window.startLesson=function(){const r=oS.apply(this,arguments);if(window.__noAddonIntro){if(typeof L!=="undefined"&&L)L.paused=false;return r}if(typeof L!=="undefined"&&L)L.paused=true;intro();return r}}
 function intro(){const o=document.createElement("div");let k=0;document.body.appendChild(o);
  const fl=Array.from({length:14},(_,i)=>`<span class="fl" style="left:${i*7}%;animation-delay:-${i*.5}s">${i%2?"✌️":"⭐"}</span>`).join("");
  const S=[{bg:"#0e8f8a",h:`<img src="teacher.webp" alt="" style="max-height:30vh" onerror="this.remove()"><h1>السلام عليكم ورحمة الله وبركاته</h1><div class="nm">أ / عماد عبد العزيز</div>`},

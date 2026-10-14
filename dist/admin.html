@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>لوحة إدارة إتقان</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:"Tajawal",system-ui,sans-serif;background:#f1faf8;color:#0f2b2e;min-height:100vh;padding:16px}
+    .adm-wrap{max-width:960px;margin:0 auto}
+    #toast{position:fixed;inset-inline:16px;inset-block-end:16px;margin-inline:auto;width:max-content;max-width:calc(100% - 32px);background:#0f2b2e;color:#fff;padding:10px 20px;border-radius:12px;font-weight:700;z-index:200;animation:pop .2s}
+    @keyframes pop{from{transform:scale(.9);opacity:0}}
+    #toast[hidden]{display:none}
+  </style>
+</head>
+<body>
+  <div class="adm-wrap">
+    <h1 style="font-size:24px;margin-bottom:4px;color:#0e8f8a">🛠️ لوحة إدارة إتقان</h1>
+    <p style="color:#4f6f72;font-size:14px;margin-bottom:20px">إدارة محتوى الموقع والإعدادات</p>
+    <div id="admin-root"></div>
+  </div>
+  <div id="toast" hidden></div>
+
+  <script src="config.js?v=20261014"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script>if(!window.supabase){document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"><\/script>')}</script>
+  <script src="itqan-admin.js?v=20261014"></script>
+</body>
+</html>

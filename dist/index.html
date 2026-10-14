@@ -170,16 +170,16 @@ nav button{padding:6px 12px;font-size:13px}
 .ibtn{width:36px;height:36px;font-size:14px}
 .hero h1{font-size:clamp(22px,5.2vw,38px)}
 .hero p.lead{font-size:15px}
-.h2{margin-block:22px 10px}.h2 h2{font-size:19px}
-.grade{font-size:16px;padding:12px 6px;border-radius:16px}.grade span{font-size:24px}.grade small{font-size:11px}
-.subj{padding:9px 10px;font-size:13.5px;border-radius:14px}.subj i{font-size:22px}
+.h2{margin-block:14px 8px}.h2 h2{font-size:20px}
+.grade{font-size:17px;padding:12px 6px;border-radius:16px}.grade span{font-size:26px}.grade small{font-size:11px}
+.subj{padding:9px 10px;font-size:14px;border-radius:14px}.subj i{font-size:24px}
 .cover{height:72px;font-size:38px}.cover .tag{font-size:11px}
-.card h3{font-size:15px}.card .bd{padding:10px 12px 12px}
+.card h3{font-size:15.5px}.card .bd{padding:10px 12px 12px}
 .meta{font-size:11.5px}
-.btn{padding:8px 14px;font-size:14px;border-radius:12px}.btn.sm{padding:5px 10px;font-size:12.5px}
+.btn{padding:9px 14px;font-size:14.5px;border-radius:14px}.btn.sm{padding:6px 10px;font-size:13px}
 .stats div{padding:4px 12px;font-size:13px}.stats b{font-size:18px}
 .sheet h2{font-size:20px}.sheet h4{font-size:15px;margin-top:12px}.sheet{padding:14px}
-.q{font-size:17px}.opt{min-height:46px;padding:8px;font-size:14px}
+.q{font-size:18px}.opt{min-height:48px;padding:10px;font-size:15px}
 .tpl b{font-size:15px}.tpl .e{font-size:30px}.tpl{padding:12px}
 .empty .big{font-size:44px}
 .balloon{width:76px;height:94px;font-size:13px}
@@ -187,6 +187,13 @@ nav button{padding:6px 12px;font-size:13px}
 footer{font-size:12.5px}
 .badge{font-size:12px}
 select,.fld{font-size:14px;padding:6px 9px}
+section.page{padding-block:12px}
+.hero{padding-block:10px 6px}
+.card,.grade,.subj,.tpl,.vx-tile,.v3q,.v3curcard,.v3g{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.cover>span,.grade span,.subj i,.tpl .e,.v3q i,.v3g .e,.vx-tile i{animation:vxicon 2.8s ease-in-out infinite;transform-origin:center bottom}
+@keyframes vxicon{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+.card:hover,.grade:hover,.subj:hover,.tpl:hover,.v3q:hover,.v3curcard:hover,.v3g:hover{transform:translateY(-4px)}
+footer{margin-top:14px;padding-block:12px}
 /* motion */
 .ticker{overflow:hidden;background:var(--teal);color:var(--teal-ink);font-weight:700;font-size:12.5px;margin-inline:-16px;padding-block:5px;position:relative;z-index:15}
 .tk{display:inline-flex;white-space:nowrap;animation:tk 55s linear infinite;will-change:transform}
@@ -404,7 +411,7 @@ section.page:not([hidden]){animation:rise2 .35s both}
 <div class="modal" id="authm" hidden role="dialog" aria-modal="true" aria-label="تسجيل بالإيميل"><div class="sheet auth" id="asheet"></div></div>
 <div class="toast" id="toast" hidden role="status"></div>
 
-<script src="config.js?v=20261012-1"></script>
+<script src="config.js?v=20261013-1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>if(!window.supabase){document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"><\/script>')}</script>
 <script>
@@ -978,9 +985,9 @@ function startBubble(){const el=$("#bub");if(!el)return;let i=0;const show=()=>{
 /* ---------- boot ---------- */
 applyTheme();initFilters();initGames();initPrep();applyCountry();updUser();renderHome();go("home");initCloud();dailyStreak();xpChip();buildTicker();startBubble();
 </script>
-   <script src="itqan-addon.js?v=20261012-1"></script>
-   <script src="itqan-curriculum.js?v=20261012-1"></script>
-   <script src="itqan-v3.js?v=20261012-1"></script>
-  <script src="special-addon.js?v=20261012-1"></script>
+   <script src="itqan-addon.js?v=20261013-1"></script>
+   <script src="itqan-curriculum.js?v=20261013-1"></script>
+   <script src="itqan-v3.js?v=20261013-1"></script>
+  <script src="special-addon.js?v=20261013-1"></script>
 
 </html>
