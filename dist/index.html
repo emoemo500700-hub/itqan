@@ -57,6 +57,8 @@ nav button[aria-current="true"]{background:var(--teal);color:var(--teal-ink)}
 .ibtn{width:40px;height:40px;border-radius:50%;border:2px solid var(--line);background:var(--surface)}
 .btn{border:0;border-radius:14px;padding:10px 18px;font-weight:800;background:var(--teal);color:var(--teal-ink);box-shadow:0 4px 0 color-mix(in srgb,var(--teal) 60%,#000);transition:transform .12s}
 .btn:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--teal) 60%,#000)}
+.btn,.ibtn,.grade,.subj,.tpl,.opt,.mc,.balloon,nav button,.brand{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;touch-action:manipulation}
+.btn.was-active,.ibtn.was-active{transform:translateY(3px) scale(.97);opacity:.85;transition:transform .15s,opacity .15s}
 .btn.o{background:var(--orange);color:#2a1100;box-shadow:0 4px 0 color-mix(in srgb,var(--orange) 55%,#000)}
 .btn.g{background:var(--surface);color:var(--ink);border:2px solid var(--line);box-shadow:none}
 .btn.sm{padding:6px 12px;font-size:14px}
@@ -233,6 +235,8 @@ section.page:not([hidden]){animation:rise2 .35s both}
 }
 </style>
 
+<div id="itqan-loader" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg,#f1faf8);flex-direction:column;gap:14px;transition:opacity .4s"><svg width="60" height="60" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="52" r="40" fill="#0e8f8a" style="animation:lp 1s ease-in-out infinite"/><circle cx="35" cy="45" r="13" fill="#fff"/><circle cx="65" cy="45" r="13" fill="#fff"/><circle cx="35" cy="46" r="6" fill="#0f2b2e"/><circle cx="65" cy="46" r="6" fill="#0f2b2e"/><path d="M44 58 L56 58 L50 70Z" fill="#ff7a2f"/></svg><p style="color:#0e8f8a;font:800 18px Tajawal,sans-serif">جارٍ تحميل إتقان…</p></div>
+<style>@keyframes lp{50%{opacity:.5;transform:scale(.95)}}</style>
 <div class="bgfloat" aria-hidden="true" id="bgf"></div>
 <canvas id="cf" aria-hidden="true"></canvas>
 
@@ -517,7 +521,12 @@ function musicOn(){if(amb||prefs.mus===false)return;const c=ac();if(!c)return;
 function musicOff(){if(!amb)return;const a=amb;amb=null;try{a.g.gain.cancelScheduledValues(a.c.currentTime);a.g.gain.setTargetAtTime(.0001,a.c.currentTime,.2);a.dg.gain.setTargetAtTime(.0001,a.c.currentTime,.2);setTimeout(()=>{try{a.src.stop();a.lfo.stop();a.dr.stop()}catch(e){}},900)}catch(e){}}
 document.addEventListener("pointerdown",()=>musicOn(),{once:true});
 document.addEventListener("visibilitychange",()=>{if(document.hidden)musicOff();else if(prefs.mus!==false&&actx)musicOn()});
-document.addEventListener("click",e=>{if(e.target.closest("nav button,.btn,.grade,.subj,.tpl,.ibtn"))tick()},true);
+document.addEventListener("click",e=>{const el=e.target.closest("nav button,.btn,.grade,.subj,.tpl,.ibtn");if(el)tick()},true);
+/* fix lingering button press effect on touch devices */
+document.addEventListener("pointerdown",e=>{const b=e.target.closest(".btn,.ibtn");if(!b)return;b.classList.add("was-active")},true);
+document.addEventListener("pointerup",e=>{document.querySelectorAll(".was-active").forEach(b=>b.classList.remove("was-active"))},true);
+document.addEventListener("pointerleave",e=>{document.querySelectorAll(".was-active").forEach(b=>b.classList.remove("was-active"))},true);
+
 const good=()=>{beep(660,.1);setTimeout(()=>beep(880,.15),90)}, bad=()=>beep(180,.25,"square");
 let tt;function toast(m){ping();const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2600)}
 function confetti(){const c=$("#cf"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;const cols=["#ff7a2f","#ffc933","#0e8f8a","#ff6f91","#7048e8","#2f9e44"];
@@ -603,18 +612,48 @@ function copyText(t){return navigator.clipboard&&navigator.clipboard.writeText?n
 function fileDownload(a){const h=`<!doctype html><meta charset="utf-8"><title>${esc(a.title)}</title><body dir="rtl" style="font-family:Tahoma,sans-serif;max-width:720px;margin:24px auto;line-height:1.9"><pre style="white-space:pre-wrap;font:inherit">${esc(actText(a))}</pre>`;
  try{const u=URL.createObjectURL(new Blob([h],{type:"text/html"}));const l=document.createElement("a");l.href=u;l.download=a.title+".html";document.body.appendChild(l);l.click();l.remove()}catch(e){}}
 
-/* ---------- auth (local demo) ---------- */
-let pending=null;
+/* ---------- auth (multi-step: email → name → role → smooth entry) ---------- */
+let pending=null;let authStep={email:"",name:"",role:""};
 function needAuth(fn){if(user)return fn();pending=fn;showAuth()}
-function showAuth(){$("#asheet").innerHTML=`<button class="btn g sm close" data-close="1">✕</button><div style="font-size:48px">🦉</div><h2>سجّل بإيميلك</h2>
- <p class="hint">بدون كلمة مرور. نحتاج إيميلك فقط لحفظ مفضلتك وتحميلاتك.</p>
- <form id="af"><label class="hint" for="em">البريد الإلكتروني</label><input class="fld" id="em" type="email" required autocomplete="email" placeholder="name@example.com" dir="ltr" value="${user?esc(user.email):""}">
- <label class="row hint" style="margin-block:8px"><input type="checkbox" id="ag" required> أوافق على الشروط وسياسة الخصوصية</label>
- <button class="btn o" type="submit" style="width:100%">دخول ←</button></form>
- <p class="hint" style="margin-top:8px">${sb?"سنرسل لك رابط دخول على بريدك، اضغط عليه وتدخل مباشرة بدون كلمة مرور.":"في هذه النسخة التجريبية يُحفظ حسابك داخل متصفحك فقط. الرابط السحري الحقيقي يُفعَّل عند ربط الموقع بقاعدة بيانات."}</p>`;
- $("#authm").hidden=false;setTimeout(()=>{const e=$("#em");e&&e.focus()},50);
- $("#af").onsubmit=ev=>{ev.preventDefault();if(sb)return magicLink($("#em").value.trim().toLowerCase());user={email:$("#em").value.trim().toLowerCase(),at:Date.now()};store.set("itqan_user",user);$("#authm").hidden=true;updUser();toast("أهلاً بك 👋");confetti();if(pending){const f=pending;pending=null;f()}}}
-function updUser(){$("#loginBtn").textContent=user?"👤 "+user.email.split("@")[0]:"تسجيل بالإيميل";if(typeof checkAdmin==="function")checkAdmin()}
+function showAuth(){authStep={email:"",name:"",role:""};renderAuthStep("email")}
+function renderAuthStep(step){
+ const S=$("#asheet");
+ if(step==="email"){
+  S.innerHTML=`<button class="btn g sm close" data-close="1">✕</button><div style="font-size:48px">🦉</div><h2>سجّل الدخول</h2>
+  <p class="hint">اكتب بريدك الإلكتروني للمتابعة</p>
+  <form id="af"><label class="hint" for="em">البريد الإلكتروني</label><input class="fld" id="em" type="email" required autocomplete="email" placeholder="name@example.com" dir="ltr" value="${user?esc(user.email):""}">
+  <button class="btn o" type="submit" style="width:100%;margin-top:12px">متابعة ←</button></form>`;
+  $("#authm").hidden=false;setTimeout(()=>{const e=$("#em");e&&e.focus()},50);
+  $("#af").onsubmit=ev=>{ev.preventDefault();const v=$("#em").value.trim();if(!v)return;authStep.email=v.toLowerCase();renderAuthStep("name")};
+ }else if(step==="name"){
+  S.innerHTML=`<button class="btn g sm close" data-close="1">✕</button><div style="font-size:48px">👋</div><h2>مرحباً بك!</h2>
+  <p class="hint">ما اسمك؟</p>
+  <form id="af2"><label class="hint" for="nm">الاسم</label><input class="fld" id="nm" type="text" required autocomplete="name" placeholder="اكتب اسمك هنا" value="${user?esc(user.name||""):""}">
+  <div class="row" style="margin-top:12px;gap:8px"><button class="btn g" type="button" id="aback">← رجوع</button><button class="btn o" type="submit" style="flex:1">متابعة ←</button></div></form>`;
+  setTimeout(()=>{const e=$("#nm");e&&e.focus()},50);
+  $("#aback").onclick=()=>renderAuthStep("email");
+  $("#af2").onsubmit=ev=>{ev.preventDefault();const v=$("#nm").value.trim();if(!v)return;authStep.name=v;renderAuthStep("role")};
+ }else if(step==="role"){
+  S.innerHTML=`<button class="btn g sm close" data-close="1">✕</button><div style="font-size:48px">🧭</div><h2>من أنت؟</h2>
+  <p class="hint">اختر ما يناسبك للدخول</p>
+  <div style="display:grid;gap:10px;margin-top:14px">
+   <button class="btn" type="button" data-role="teacher" style="text-align:right;padding:14px"><span style="font-size:24px">👩‍🏫</span> معلم / معلمة</button>
+   <button class="btn" type="button" data-role="parent" style="text-align:right;padding:14px"><span style="font-size:24px">👨‍👩‍👧</span> ولي أمر</button>
+   <button class="btn" type="button" data-role="student" style="text-align:right;padding:14px"><span style="font-size:24px">🧒</span> طالب / طالبة</button>
+  </div>
+  <div class="row" style="margin-top:12px"><button class="btn g" type="button" id="aback2">← رجوع</button></div>`;
+  $("#aback2").onclick=()=>renderAuthStep("name");
+  S.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{authStep.role=b.dataset.role;finishAuth()});
+ }
+}
+function finishAuth(){
+ user={email:authStep.email,name:authStep.name,role:authStep.role,at:Date.now()};store.set("itqan_user",user);
+ $("#asheet").innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:56px;animation:pop .4s">${authStep.role==="teacher"?"👩‍🏫":authStep.role==="parent"?"👨‍👩‍👧":"🧒"}</div><h2>أهلاً ${esc(authStep.name)}! 👋</h2><p class="hint">جارٍ دخولك للموقع…</p></div>`;
+ $("#authm").hidden=false;
+ updUser();confetti();
+ setTimeout(()=>{$("#authm").hidden=true;toast("أهلاً بك "+authStep.name+" 👋");if(pending){const f=pending;pending=null;f()}},1400);
+}
+function updUser(){$("#loginBtn").textContent=user?"👤 "+(user.name||user.email.split("@")[0]):"تسجيل بالإيميل";if(typeof checkAdmin==="function")checkAdmin()}
 $("#loginBtn").onclick=()=>user?go("my"):showAuth();
 
 /* ---------- actions ---------- */
@@ -984,6 +1023,8 @@ function startBubble(){const el=$("#bub");if(!el)return;let i=0;const show=()=>{
 
 /* ---------- boot ---------- */
 applyTheme();initFilters();initGames();initPrep();applyCountry();updUser();renderHome();go("home");initCloud();dailyStreak();xpChip();buildTicker();startBubble();
+/* remove loader after init */
+setTimeout(()=>{const ld=$("#itqan-loader");if(ld){ld.style.opacity="0";setTimeout(()=>ld.remove(),400)}},100);
 </script>
    <script src="itqan-addon.js?v=20261013-1"></script>
    <script src="itqan-curriculum.js?v=20261013-1"></script>
